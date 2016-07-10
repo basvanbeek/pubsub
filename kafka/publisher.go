@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/Shopify/sarama"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-kit/kit/log"
 	"github.com/golang/protobuf/proto"
 
@@ -189,6 +190,7 @@ func NewKafkaPublisher(
 		p = &syncPublisher{
 			publisher: publisher,
 			topic:     topic,
+			logger:    pc.logger,
 		}
 	} else {
 		if pc.successes != nil {
@@ -201,6 +203,7 @@ func NewKafkaPublisher(
 		ap := &asyncPublisher{
 			publisher: publisher,
 			topic:     topic,
+			logger:    pc.logger,
 		}
 
 		ap.wg.Add(1)
@@ -273,6 +276,8 @@ func (p *asyncPublisher) Stop() error {
 func (p *asyncPublisher) logErrors() {
 	defer p.wg.Done()
 	for pe := range p.publisher.Errors() {
+		spew.Dump(pe)
+		spew.Dump(p)
 		p.logger.Log(
 			"result", "failed to produce msg",
 			"msg", pe.Msg,
