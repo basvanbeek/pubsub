@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/Shopify/sarama"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-kit/kit/log"
 	"github.com/golang/protobuf/proto"
 
@@ -276,8 +275,6 @@ func (p *asyncPublisher) Stop() error {
 func (p *asyncPublisher) logErrors() {
 	defer p.wg.Done()
 	for pe := range p.publisher.Errors() {
-		spew.Dump(pe)
-		spew.Dump(p)
 		p.logger.Log(
 			"result", "failed to produce msg",
 			"msg", pe.Msg,
